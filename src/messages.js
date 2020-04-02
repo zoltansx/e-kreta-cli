@@ -6,6 +6,10 @@ const path = require('path');
 const ora = require('ora');
 const request = require('request-promise-native');
 
+var customHeaderRequest = request.defaults({
+  headers: {'User-Agent': "Kreta.Ellenorzo/2.9.11.2020033003 (Android; 0.0)"}
+})
+
 const utils = require('./utils');
 
 module.exports = async directory => {
@@ -17,7 +21,7 @@ module.exports = async directory => {
     mkdirp.sync(directory);
 
     const messages = JSON.parse(
-      await request.get(
+      await customHeaderRequest.get(
         'https://eugyintezes.e-kreta.hu/integration-kretamobile-api/v1/kommunikacio/postaladaelemek/sajat',
         {
           auth: { bearer: accessToken },
@@ -30,7 +34,7 @@ module.exports = async directory => {
 
     for (let fMessage of messages) {
       const message = JSON.parse(
-        await request.get(
+        await customHeaderRequest.get(
           `https://eugyintezes.e-kreta.hu/integration-kretamobile-api/v1/kommunikacio/postaladaelemek/${
             fMessage['azonosito']
           }`,
@@ -74,7 +78,7 @@ ${message['uzenet']['szoveg']}
 
       for (let attachment of message['uzenet']['csatolmanyok']) {
         const data = Buffer.from(
-          await request.get(
+          await customHeaderRequest.get(
             `https://eugyintezes.e-kreta.hu/integration-kretamobile-api/v1/dokumentumok/uzenetek/${
               attachment['azonosito']
             }`,

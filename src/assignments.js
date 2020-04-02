@@ -6,6 +6,10 @@ const path = require('path');
 const ora = require('ora');
 const request = require('request-promise-native');
 
+var customHeaderRequest = request.defaults({
+  headers: {'User-Agent': "Kreta.Ellenorzo/2.9.11.2020033003 (Android; 0.0)"}
+})
+
 const utils = require('./utils');
 
 module.exports = async directory => {
@@ -17,7 +21,7 @@ module.exports = async directory => {
     mkdirp.sync(directory);
 
     const lessons = JSON.parse(
-      await request.get(`https://${utils.conf.get('institute')}.e-kreta.hu/mapi/api/v1/Lesson`, {
+      await customHeaderRequest.get(`https://${utils.conf.get('institute')}.e-kreta.hu/mapi/api/v1/Lesson`, {
         auth: { bearer: accessToken },
       }),
     );
@@ -29,7 +33,7 @@ module.exports = async directory => {
       if (!lesson['TeacherHomeworkId']) continue;
 
       const assignment = JSON.parse(
-        await request.get(
+        await customHeaderRequest.get(
           `https://${utils.conf.get(
             'institute',
           )}.e-kreta.hu/mapi/api/v1/HaziFeladat/TanarHaziFeladat/${lesson['TeacherHomeworkId']}`,

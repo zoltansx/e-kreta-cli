@@ -3,11 +3,16 @@ const { bold, red } = require('chalk');
 const configstore = require('configstore');
 const request = require('request-promise-native');
 
+
+var customHeaderRequest = request.defaults({
+  headers: {'User-Agent': "Kreta.Ellenorzo/2.9.11.2020033003 (Android; 0.0)"}
+})
+
 exports.pkg = require('../package.json');
 exports.conf = new configstore(exports.pkg.name);
 
 exports.getInstitutes = async () => {
-  const response = await request.get('https://kretaglobalmobileapi.ekreta.hu/api/v1/Institute', {
+  const response = await customHeaderRequest.get('https://kretaglobalmobileapi.ekreta.hu/api/v1/Institute', {
     headers: { apiKey: '7856d350-1fda-45f5-822d-e1a2f3f1acf0' },
   });
   return JSON.parse(response);
@@ -15,7 +20,7 @@ exports.getInstitutes = async () => {
 
 async function loginUtil(institute, username, password) {
   try {
-    const response = await request.post(`https://${institute}.e-kreta.hu/idp/api/v1/Token`, {
+    const response = await customHeaderRequest.post(`https://${institute}.e-kreta.hu/idp/api/v1/Token`, {
       body: `institute_code=${institute}&userName=${username}&password=${password}&grant_type=password&client_id=919e0c1c-76a2-4646-a2fb-7085bbbf3c56`,
     });
     return JSON.parse(response);
